@@ -19,4 +19,6 @@ interface ProductRepository: CrudRepository<Product, UUID> {
     @Modifying
     @Query("UPDATE product SET deleted=true WHERE id= :id", nativeQuery = true)
     fun logicDeleteProduct(@Param("id") id:UUID)
+
+    fun findProductsByDeletedFalse(): List<Product>
 }

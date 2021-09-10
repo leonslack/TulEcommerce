@@ -22,6 +22,7 @@ class CartBusiness @Autowired constructor(
     override fun addToCart(cartView: CartView) {
         try {
             val product = productBusiness.findProductById(cartView.productId)
+
             val cart = cartView.toCart(product, product.toProductView().price!!)
             cartRepository.save(cart)
         } catch (e: Exception){
@@ -64,8 +65,15 @@ class CartBusiness @Autowired constructor(
         }
     }
 
+    @Transactional
     override fun checkout(userId: Long): Double {
-        TODO("Not yet implemented")
+        val pendingCarts = listCart(userId)
+        var total = 0.0
+        for (cart in pendingCarts){
+            total += cart.quantity.times(cart.unitPrice)
+            cartRepository.changeCartStatus(CartStatus.FINISHED.ordinal, cart.id)
+        }
+        return total
     }
 
     @Transactional

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping( Constants.URL_API_CARTS)
@@ -27,7 +28,7 @@ class CartController  @Autowired constructor(
     }
 
     @PostMapping
-    fun addToCart(@RequestBody cartView: CartView): ResponseEntity<Any>{
+    fun addToCart(@Valid @RequestBody cartView: CartView): ResponseEntity<Any>{
         return try {
             cartBusiness.addToCart(cartView)
             ResponseEntity(HttpStatus.CREATED)
@@ -47,10 +48,20 @@ class CartController  @Autowired constructor(
     }
 
     @PutMapping
-    fun modifyCart(@RequestBody cart:Cart): ResponseEntity<Any>{
+    fun modifyCart(@Valid @RequestBody cart:Cart): ResponseEntity<Any>{
         return try {
             cartBusiness.updateCart(cart)
             ResponseEntity(HttpStatus.OK)
+        } catch (e: BusinessException){
+            ResponseEntity(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @GetMapping("/checkout/{userId}")
+    fun checkout(@PathVariable userId: Long): ResponseEntity<Any>{
+        return try {
+
+            ResponseEntity(cartBusiness.checkout(userId),HttpStatus.OK)
         } catch (e: BusinessException){
             ResponseEntity(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
         }

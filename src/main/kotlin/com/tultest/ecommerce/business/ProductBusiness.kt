@@ -87,7 +87,7 @@ class ProductBusiness @Autowired constructor(
     @Throws(BusinessException::class)
     override fun listAllProducts(): List<ProductView> {
         try {
-            return productRepository.findAll().map{product -> product.toProductView()}
+            return productRepository.findProductsByDeletedFalse().map{product -> product.toProductView()}
         } catch (e: Exception){
             throw BusinessException(e.message)
         }

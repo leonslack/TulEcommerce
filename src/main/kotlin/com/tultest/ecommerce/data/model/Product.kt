@@ -1,12 +1,10 @@
 package com.tultest.ecommerce.data.model
 
-import org.hibernate.annotations.Where
 import java.util.*
 import javax.persistence.*
 
 @Entity
 @Table(name = "product")
-@Where(clause = "deleted = 0")
 data class Product(
         val name: String = "",
         val description: String = "",

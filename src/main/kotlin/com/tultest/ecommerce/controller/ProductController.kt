@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping( Constants.URL_API_PRODUCTS)
@@ -26,7 +27,7 @@ class ProductController @Autowired constructor(
     }
 
     @PostMapping
-    fun createProduct(@RequestBody product: ProductView): ResponseEntity<ProductView>{
+    fun createProduct(@Valid @RequestBody product: ProductView): ResponseEntity<ProductView>{
         return try {
             ResponseEntity(productBusiness.createProduct(product), HttpStatus.CREATED)
         } catch (e: BusinessException){
@@ -47,7 +48,7 @@ class ProductController @Autowired constructor(
     }
 
     @PutMapping
-    fun updateProduct(@RequestBody product: ProductView): ResponseEntity<ProductView>{
+    fun updateProduct(@Valid @RequestBody product: ProductView): ResponseEntity<ProductView>{
         return try {
             ResponseEntity(productBusiness.updateProduct(product), HttpStatus.OK)
         } catch (e: BusinessException){
