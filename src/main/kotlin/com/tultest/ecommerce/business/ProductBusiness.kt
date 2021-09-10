@@ -11,6 +11,7 @@ import com.tultest.ecommerce.exception.BusinessException
 import javassist.NotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import kotlin.jvm.Throws
 
@@ -23,29 +24,41 @@ class ProductBusiness @Autowired constructor(
     @Throws(BusinessException::class)
     override fun createProduct(productView: ProductView): ProductView {
         try {
-            val savedProduct = productRepository.save(productView.toProduct())
-            createPrice(savedProduct, productView)
+            val savedProduct = productRepository.save(productView.toProduct(createPrice(productView)))
+            productView.id = savedProduct.id
             return productView;
         } catch (e: Exception){
             throw BusinessException(e.message)
         }
     }
 
-    private fun createPrice(product: Product, productView: ProductView){
-        val price = Price(productView.price,productView.discount, product)
-        priceRepository.save(price)
+    private fun createPrice(productView: ProductView):Price{
+        val price = Price(productView.price,productView.discount)
+        return priceRepository.save(price)
     }
 
     @Throws(BusinessException::class)
-    override fun updateProduct(product: Product): Product {
+    @Transactional
+    override fun updateProduct(productView: ProductView): ProductView {
         try {
-            return productRepository.save(product)
+            var productToUpdate = findProductById(productView.id)
+            updateProductFields(productToUpdate, productView)
+            updateProductPrice(productView, productToUpdate.price!!)
+            return productView
         } catch (e: Exception){
             throw BusinessException(e.message)
         }
     }
 
-    @Throws(BusinessException::class)
+    private fun updateProductPrice(productView: ProductView, price: Price){
+        priceRepository.updatePrice(productView.discount!!, productView.price!!, price.id)
+    }
+
+    private fun updateProductFields(product: Product, productView: ProductView){
+        productRepository.updateProduct(productView.description,productView.name,productView.sku,product.id)
+    }
+
+    @Throws(NotFoundException::class)
     private fun findProductById(productId: UUID): Product{
         val optional: Optional<Product>
         try {
@@ -61,11 +74,11 @@ class ProductBusiness @Autowired constructor(
         }
     }
 
-    @Throws(BusinessException::class)
+    @Transactional
     override fun deleteProduct(productId: UUID) {
         val productToDelete = findProductById(productId)
         try {
-            productRepository.delete(productToDelete)
+            productRepository.logicDeleteProduct(productToDelete.id)
         } catch (e:Exception){
             throw BusinessException(e.message)
         }
@@ -75,15 +88,6 @@ class ProductBusiness @Autowired constructor(
     override fun listAllProducts(): List<ProductView> {
         try {
             return productRepository.findAll().map{product -> product.toProductView()}
-        } catch (e: Exception){
-            throw BusinessException(e.message)
-        }
-    }
-
-    @Throws(BusinessException::class)
-    override fun listProductAdmin(): List<Product> {
-        try {
-            return productRepository.findAll()
         } catch (e: Exception){
             throw BusinessException(e.message)
         }

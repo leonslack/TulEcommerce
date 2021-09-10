@@ -1,8 +1,11 @@
 package com.tultest.ecommerce.business
 
+import com.tultest.ecommerce.constant.CartStatus
 import com.tultest.ecommerce.data.model.Cart
 import com.tultest.ecommerce.data.repository.CartRepository
 import com.tultest.ecommerce.data.view.ProductView
+import com.tultest.ecommerce.data.view.toProductView
+import com.tultest.ecommerce.exception.BusinessException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,7 +20,13 @@ class CartBusiness @Autowired constructor(
     }
 
     override fun listCart(userId: Long): List<Cart> {
-        TODO("Not yet implemented")
+        try {
+            return cartRepository.findCartByUserIdEqualsAndStatusEquals(
+                    userId, CartStatus.PENDING
+            )
+        } catch (e: Exception){
+            throw BusinessException(e.message)
+        }
     }
 
     override fun removeFromCart(productId: UUID) {

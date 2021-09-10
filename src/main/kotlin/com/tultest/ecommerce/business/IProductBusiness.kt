@@ -6,8 +6,7 @@ import java.util.*
 
 interface IProductBusiness {
     fun createProduct(product: ProductView):ProductView
-    fun updateProduct(product: Product):Product
+    fun updateProduct(product: ProductView):ProductView
     fun deleteProduct(productId:UUID)
     fun listAllProducts(): List<ProductView>
-    fun listProductAdmin(): List<Product>
 }

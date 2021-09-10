@@ -1,5 +1,6 @@
 package com.tultest.ecommerce.data.view
 
+import com.tultest.ecommerce.data.model.Price
 import com.tultest.ecommerce.data.model.Product
 
 fun Product.toProductView() = ProductView(
@@ -7,12 +8,13 @@ fun Product.toProductView() = ProductView(
         name = name,
         description = description,
         sku = sku,
-        price = price?.price?.minus(( price.price * price.discount!!)/100),
+        price = price?.price?.minus(( price.price!! * price.discount!!)/100),
         discount = price?.discount
 )
 
-fun ProductView.toProduct() = Product(
+fun ProductView.toProduct(price: Price) = Product(
         name = name,
         description = description,
         sku = sku,
+        price = price
 )
