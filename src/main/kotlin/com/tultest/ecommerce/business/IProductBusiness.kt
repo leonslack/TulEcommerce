@@ -9,4 +9,5 @@ interface IProductBusiness {
     fun updateProduct(product: ProductView):ProductView
     fun deleteProduct(productId:UUID)
     fun listAllProducts(): List<ProductView>
+    fun findProductById(productId: UUID): Product
 }

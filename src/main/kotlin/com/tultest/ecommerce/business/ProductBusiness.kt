@@ -59,7 +59,7 @@ class ProductBusiness @Autowired constructor(
     }
 
     @Throws(NotFoundException::class)
-    private fun findProductById(productId: UUID): Product{
+    override fun findProductById(productId: UUID): Product{
         val optional: Optional<Product>
         try {
             optional = productRepository.findById(productId)
